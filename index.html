@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative Portfolio | Graphic Design</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'display': ['Syne', 'sans-serif'],
+                        'body': ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        'neon-lime': '#ccff00',
+                        'deep-purple': '#1a0b2e',
+                        'electric-pink': '#ff006e',
+                        'cyan-bright': '#00f5ff',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'marquee': 'marquee 25s linear infinite',
+                        'spin-slow': 'spin 20s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-50%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            cursor: none;
+        }
+
+        .custom-cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ccff00;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.2s, background-color 0.2s;
+            mix-blend-mode: difference;
+        }
+
+        .custom-cursor.hover {
+            transform: scale(2.5);
+            background-color: #ccff00;
+        }
+
+        .grain-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .text-stroke {
+            -webkit-text-stroke: 2px #ccff00;
+            color: transparent;
+        }
+
+        .project-card {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px) rotate(1deg);
+        }
+
+        .project-card:hover .project-overlay {
+            opacity: 1;
+        }
+
+        .project-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .magnetic-btn {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-link {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #ccff00;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            transform: translateX(0);
+        }
+
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .scroll-reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .filter-btn.active {
+            background-color: #ccff00;
+            color: #1a0b2e;
+        }
+
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 10s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-deep-purple text-white font-body overflow-x-hidden">
+    <!-- Custom Cursor -->
+    <div class="custom-cursor" id="cursor"></div>
+
+    <!-- Grain Overlay -->
+    <div class="grain-overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 px-6 py-6 mix-blend-difference">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="#" class="font-display text-2xl font-bold tracking-tighter hover-trigger">
+                PORTFOLIO<span class="text-neon-lime">.</span>
+            </a>
+
+            <div class="hidden md:flex space-x-8">
+                <a href="#work" class="nav-link font-medium text-sm tracking-widest hover-trigger">WORK</a>
+                <a href="#about" class="nav-link font-medium text-sm tracking-widest hover-trigger">ABOUT</a>
+                <a href="#contact" class="nav-link font-medium text-sm tracking-widest hover-trigger">CONTACT</a>
+            </div>
+
+            <button class="md:hidden text-white hover-trigger" onclick="toggleMenu()">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden fixed inset-0 bg-deep-purple z-40 flex flex-col items-center justify-center space-y-8">
+            <a href="#work" class="font-display text-4xl font-bold hover:text-neon-lime transition-colors" onclick="toggleMenu()">WORK</a>
+            <a href="#about" class="font-display text-4xl font-bold hover:text-neon-lime transition-colors" onclick="toggleMenu()">ABOUT</a>
+            <a href="#contact" class="font-display text-4xl font-bold hover:text-neon-lime transition-colors" onclick="toggleMenu()">CONTACT</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden px-6">
+        <!-- Background Blobs -->
+        <div class="blob bg-electric-pink w-96 h-96 rounded-full top-20 -left-20"></div>
+        <div class="blob bg-cyan-bright w-80 h-80 rounded-full bottom-20 -right-20 animation-delay-2000"></div>
+        <div class="blob bg-neon-lime w-64 h-64 rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animation-delay-4000"></div>
+
+        <div class="relative z-10 text-center max-w-6xl mx-auto">
+            <p class="text-neon-lime font-medium tracking-[0.3em] text-sm mb-6 scroll-reveal">GRAPHIC DESIGNER & VISUAL ARTIST</p>
+
+            <h1 class="font-display font-bold text-6xl md:text-8xl lg:text-9xl leading-none mb-8 scroll-reveal" style="transition-delay: 0.1s">
+                <span class="block">CREATIVE</span>
+                <span class="block text-stroke">PORTFOLIO</span>
+            </h1>
+
+            <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 scroll-reveal" style="transition-delay: 0.2s">
+                Crafting visual experiences that blend bold aesthetics with strategic thinking. 
+                Specializing in brand identity, digital design, and artistic direction.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center scroll-reveal" style="transition-delay: 0.3s">
+                <a href="#work" class="magnetic-btn hover-trigger inline-flex items-center justify-center px-8 py-4 bg-neon-lime text-deep-purple font-bold rounded-full hover:scale-105 transition-transform">
+                    VIEW WORK
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                    </svg>
+                </a>
+                <a href="#contact" class="magnetic-btn hover-trigger inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-deep-purple transition-all">
+                    GET IN TOUCH
+                </a>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <svg class="w-6 h-6 text-neon-lime" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Marquee Section -->
+    <div class="bg-neon-lime text-deep-purple py-4 overflow-hidden">
+        <div class="flex whitespace-nowrap animate-marquee">
+            <span class="font-display text-2xl font-bold mx-8">BRAND IDENTITY</span>
+            <span class="text-2xl mx-4">★</span>
+            <span class="font-display text-2xl font-bold mx-8">DIGITAL DESIGN</span>
+            <span class="text-2xl mx-4">★</span>
+            <span class="font-display text-2xl font-bold mx-8">ART DIRECTION</span>
+            <span class="text-2xl mx-4">★</span>
+            <span class="font-display text-2xl font-bold mx-8">ILLUSTRATION</span>
+            <span class="text-2xl mx-4">★</span>
+            <span class="font-display text-2xl font-bold mx-8">MOTION GRAPHICS</span>
+            <span class="text-2xl mx-4">★</span>
+            <span class="font-display text-2xl font-bold mx-8">BRAND IDENTITY</span>
+            <span class="text-2xl mx-4">★</span>
+            <span class="font-display text-2xl font-bold mx-8">DIGITAL DESIGN</span>
+            <span class="text-2xl mx-4">★</span>
+            <span class="font-display text-2xl font-bold mx-8">ART DIRECTION</span>
+            <span class="text-2xl mx-4">★</span>
+            <span class="font-display text-2xl font-bold mx-8">ILLUSTRATION</span>
+            <span class="text-2xl mx-4">★</span>
+            <span class="font-display text-2xl font-bold mx-8">MOTION GRAPHICS</span>
+            <span class="text-2xl mx-4">★</span>
+        </div>
+    </div>
+
+    <!-- Work Section -->
+    <section id="work" class="py-32 px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 scroll-reveal">
+                <div>
+                    <p class="text-neon-lime font-medium tracking-widest text-sm mb-4">SELECTED PROJECTS</p>
+                    <h2 class="font-display text-5xl md:text-7xl font-bold">WORK</h2>
+                </div>
+
+                <!-- Filter Buttons -->
+                <div class="flex flex-wrap gap-3 mt-6 md:mt-0">
+                    <button class="filter-btn active hover-trigger px-6 py-2 border border-white/30 rounded-full text-sm font-medium transition-all" data-filter="all">ALL</button>
+                    <button class="filter-btn hover-trigger px-6 py-2 border border-white/30 rounded-full text-sm font-medium transition-all" data-filter="branding">BRANDING</button>
+                    <button class="filter-btn hover-trigger px-6 py-2 border border-white/30 rounded-full text-sm font-medium transition-all" data-filter="digital">DIGITAL</button>
+                    <button class="filter-btn hover-trigger px-6 py-2 border border-white/30 rounded-full text-sm font-medium transition-all" data-filter="print">PRINT</button>
+                </div>
+            </div>
+
+            <!-- Projects Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="projectsGrid">
+                <!-- Project 1 -->
+                <div class="project-card group relative overflow-hidden rounded-2xl cursor-pointer scroll-reveal" data-category="branding">
+                    <div class="aspect-[4/5] overflow-hidden bg-gradient-to-br from-purple-900 to-pink-900">
+                        <img src="https://images.unsplash.com/photo-1634942537034-2531766767d1?w=800&q=80" alt="Brand Identity Project" class="w-full h-full object-cover transition-transform duration-700">
+                    </div>
+                    <div class="project-overlay absolute inset-0 bg-deep-purple/90 opacity-0 transition-opacity duration-300 flex flex-col justify-end p-8">
+                        <p class="text-neon-lime text-sm font-medium tracking-widest mb-2">BRANDING</p>
+                        <h3 class="font-display text-2xl font-bold mb-2">Neon Flux Identity</h3>
+                        <p class="text-gray-400 text-sm">Complete brand system for a electronic music festival</p>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="project-card group relative overflow-hidden rounded-2xl cursor-pointer scroll-reveal" data-category="digital" style="transition-delay: 0.1s">
+                    <div class="aspect-[4/5] overflow-hidden bg-gradient-to-br from-blue-900 to-cyan-900">
+                        <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&q=80" alt="Digital Design Project" class="w-full h-full object-cover transition-transform duration-700">
+                    </div>
+                    <div class="project-overlay absolute inset-0 bg-deep-purple/90 opacity-0 transition-opacity duration-300 flex flex-col justify-end p-8">
+                        <p class="text-neon-lime text-sm font-medium tracking-widest mb-2">DIGITAL</p>
+                        <h3 class="font-display text-2xl font-bold mb-2">Aqua Interface</h3>
+                        <p class="text-gray-400 text-sm">UI/UX design for a sustainable water tracking app</p>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="project-card group relative overflow-hidden rounded-2xl cursor-pointer scroll-reveal" data-category="print" style="transition-delay: 0.2s">
+                    <div class="aspect-[4/5] overflow-hidden bg-gradient-to-br from-orange-900 to-red-900">
+                        <img src="https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&q=80" alt="Print Design Project" class="w-full h-full object-cover transition-transform duration-700">
+                    </div>
+                    <div class="project-overlay absolute inset-0 bg-deep-purple/90 opacity-0 transition-opacity duration-300 flex flex-col justify-end p-8">
+                        <p class="text-neon-lime text-sm font-medium tracking-widest mb-2">PRINT</p>
+                        <h3 class="font-display text-2xl font-bold mb-2">Type Specimen</h3>
+                        <p class="text-gray-400 text-sm">Editorial design exploring experimental typography</p>
+                    </div>
+                </div>
+
+                <!-- Project 4 -->
+                <div class="project-card group relative overflow-hidden rounded-2xl cursor-pointer scroll-reveal" data-category="branding">
+                    <div class="aspect-[4/5] overflow-hidden bg-gradient-to-br from-green-900 to-emerald-900">
+                        <img src="https://images.unsplash.com/photo-1600607686527-6fb886090705?w=800&q=80" alt="Brand Identity Project" class="w-full h-full object-cover transition-transform duration-700">
+                    </div>
+                    <div class="project-overlay absolute inset-0 bg-deep-purple/90 opacity-0 transition-opacity duration-300 flex flex-col justify-end p-8">
+                        <p class="text-neon-lime text-sm font-medium tracking-widest mb-2">BRANDING</p>
+                        <h3 class="font-display text-2xl font-bold mb-2">Verde Organics</h3>
+                        <p class="text-gray-400 text-sm">Sustainable packaging and brand identity system</p>
+                    </div>
+                </div>
+
+                <!-- Project 5 -->
+                <div class="project-card group relative overflow-hidden rounded-2xl cursor-pointer scroll-reveal" data-category="digital" style="transition-delay: 0.1s">
+                    <div class="aspect-[4/5] overflow-hidden bg-gradient-to-br from-indigo-900 to-purple-900">
+                        <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80" alt="Digital Art Project" class="w-full h-full object-cover transition-transform duration-700">
+                    </div>
+                    <div class="project-overlay absolute inset-0 bg-deep-purple/90 opacity-0 transition-opacity duration-300 flex flex-col justify-end p-8">
+                        <p class="text-neon-lime text-sm font-medium tracking-widest mb-2">DIGITAL</p>
+                        <h3 class="font-display text-2xl font-bold mb-2">Retro Wave</h3>
+                        <p class="text-gray-400 text-sm">3D visualizations for a synthwave music album</p>
+                    </div>
+                </div>
+
+                <!-- Project 6 -->
+                <div class="project-card group relative overflow-hidden rounded-2xl cursor-pointer scroll-reveal" data-category="print" style="transition-delay: 0.2s">
+                    <div class="aspect-[4/5] overflow-hidden bg-gradient-to-br from-yellow-900 to-orange-900">
+                        <img src="https://images.unsplash.com/photo-1541462608143-67571c6738dd?w=800&q=80" alt="Print Design Project" class="w-full h-full object-cover transition-transform duration-700">
+                    </div>
+                    <div class="project-overlay absolute inset-0 bg-deep-purple/90 opacity-0 transition-opacity duration-300 flex flex-col justify-end p-8">
+                        <p class="text-neon-lime text-sm font-medium tracking-widest mb-2">PRINT</p>
+                        <h3 class="font-display text-2xl font-bold mb-2">Cultural Magazine</h3>
+                        <p class="text-gray-400 text-sm">Art direction and layout design for quarterly publication</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-16 scroll-reveal">
+                <button class="magnetic-btn hover-trigger inline-flex items-center px-8 py-4 border-2 border-neon-lime text-neon-lime font-bold rounded-full hover:bg-neon-lime hover:text-deep-purple transition-all">
+                    LOAD MORE PROJECTS
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-32 px-6 relative overflow-hidden">
+        <div class="blob bg-electric-pink w-96 h-96 rounded-full -right-48 top-1/4"></div>
+
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="scroll-reveal">
+                    <p class="text-neon-lime font-medium tracking-widest text-sm mb-4">ABOUT ME</p>
+                    <h2 class="font-display text-5xl md:text-6xl font-bold mb-8 leading-tight">
+                        DESIGNING THE
+                        <span class="text-stroke">FUTURE</span>
+                        OF VISUAL CULTURE
+                    </h2>
+                    <div class="space-y-6 text-gray-400 text-lg">
+                        <p>
+                            I'm a multidisciplinary graphic designer with over 8 years of experience crafting 
+                            visual identities that resonate. My work sits at the intersection of bold aesthetics 
+                            and strategic thinking, creating designs that don't just look good—they perform.
+                        </p>
+                        <p>
+                            From startups to established brands, I help clients translate their vision into 
+                            compelling visual narratives. My approach combines rigorous research with intuitive 
+                            creativity, ensuring every project is both meaningful and memorable.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-8 mt-12">
+                        <div>
+                            <p class="font-display text-4xl font-bold text-neon-lime">8+</p>
+                            <p class="text-sm text-gray-500 mt-2">Years Experience</p>
+                        </div>
+                        <div>
+                            <p class="font-display text-4xl font-bold text-neon-lime">150+</p>
+                            <p class="text-sm text-gray-500 mt-2">Projects Completed</p>
+                        </div>
+                        <div>
+                            <p class="font-display text-4xl font-bold text-neon-lime">40+</p>
+                            <p class="text-sm text-gray-500 mt-2">Happy Clients</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative scroll-reveal">
+                    <div class="relative z-10 rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80" alt="Designer Portrait" class="w-full h-auto grayscale hover:grayscale-0 transition-all duration-500">
+                    </div>
+                    <div class="absolute -inset-4 border-2 border-neon-lime rounded-2xl -z-10 transform rotate-3"></div>
+                    <div class="absolute -bottom-6 -right-6 bg-neon-lime text-deep-purple p-6 rounded-xl">
+                        <p class="font-display font-bold text-xl">Available for<br>freelance work</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills -->
+            <div class="mt-32 scroll-reveal">
+                <h3 class="font-display text-3xl font-bold mb-12 text-center">EXPERTISE</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <div class="text-center group hover-trigger">
+                        <div class="w-20 h-20 mx-auto mb-4 rounded-full border-2 border-neon-lime flex items-center justify-center group-hover:bg-neon-lime transition-colors">
+                            <svg class="w-10 h-10 text-neon-lime group-hover:text-deep-purple transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                            </svg>
+                        </div>
+                        <p class="font-medium">Brand Identity</p>
+                    </div>
+                    <div class="text-center group hover-trigger">
+                        <div class="w-20 h-20 mx-auto mb-4 rounded-full border-2 border-neon-lime flex items-center justify-center group-hover:bg-neon-lime transition-colors">
+                            <svg class="w-10 h-10 text-neon-lime group-hover:text-deep-purple transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <p class="font-medium">Digital Design</p>
+                    </div>
+                    <div class="text-center group hover-trigger">
+                        <div class="w-20 h-20 mx-auto mb-4 rounded-full border-2 border-neon-lime flex items-center justify-center group-hover:bg-neon-lime transition-colors">
+                            <svg class="w-10 h-10 text-neon-lime group-hover:text-deep-purple transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <p class="font-medium">Motion Graphics</p>
+                    </div>
+                    <div class="text-center group hover-trigger">
+                        <div class="w-20 h-20 mx-auto mb-4 rounded-full border-2 border-neon-lime flex items-center justify-center group-hover:bg-neon-lime transition-colors">
+                            <svg class="w-10 h-10 text-neon-lime group-hover:text-deep-purple transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </div>
+                        <p class="font-medium">Illustration</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-32 px-6 relative">
+        <div class="max-w-4xl mx-auto text-center">
+            <p class="text-neon-lime font-medium tracking-widest text-sm mb-4 scroll-reveal">LET'S WORK TOGETHER</p>
+            <h2 class="font-display text-5xl md:text-7xl font-bold mb-8 scroll-reveal">
+                READY TO START<br>
+                <span class="text-stroke">YOUR PROJECT?</span>
+            </h2>
+            <p class="text-gray-400 text-xl mb-12 scroll-reveal">
+                Have a project in mind? Let's create something extraordinary together.
+            </p>
+
+            <form class="max-w-xl mx-auto space-y-6 scroll-reveal" onsubmit="handleSubmit(event)">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <input type="text" placeholder="Your Name" required 
+                        class="w-full px-6 py-4 bg-white/5 border border-white/20 rounded-full focus:border-neon-lime focus:outline-none transition-colors text-white placeholder-gray-500 hover-trigger">
+                    <input type="email" placeholder="Your Email" required 
+                        class="w-full px-6 py-4 bg-white/5 border border-white/20 rounded-full focus:border-neon-lime focus:outline-none transition-colors text-white placeholder-gray-500 hover-trigger">
+                </div>
+                <input type="text" placeholder="Project Type" 
+                    class="w-full px-6 py-4 bg-white/5 border border-white/20 rounded-full focus:border-neon-lime focus:outline-none transition-colors text-white placeholder-gray-500 hover-trigger">
+                <textarea placeholder="Tell me about your project..." rows="4" required 
+                    class="w-full px-6 py-4 bg-white/5 border border-white/20 rounded-2xl focus:border-neon-lime focus:outline-none transition-colors text-white placeholder-gray-500 resize-none hover-trigger"></textarea>
+
+                <button type="submit" class="magnetic-btn hover-trigger w-full md:w-auto px-12 py-4 bg-neon-lime text-deep-purple font-bold rounded-full hover:scale-105 transition-transform inline-flex items-center justify-center">
+                    SEND MESSAGE
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                    </svg>
+                </button>
+            </form>
+
+            <div class="mt-16 flex flex-col md:flex-row justify-center items-center gap-8 scroll-reveal">
+                <a href="mailto:hello@portfolio.com" class="hover-trigger flex items-center gap-3 text-gray-400 hover:text-neon-lime transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    hello@portfolio.com
+                </a>
+                <span class="hidden md:block text-gray-600">|</span>
+                <div class="flex gap-6">
+                    <a href="#" class="hover-trigger text-gray-400 hover:text-neon-lime transition-colors">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                    </a>
+                    <a href="#" class="hover-trigger text-gray-400 hover:text-neon-lime transition-colors">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    </a>
+                    <a href="#" class="hover-trigger text-gray-400 hover:text-neon-lime transition-colors">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                    </a>
+                    <a href="#" class="hover-trigger text-gray-400 hover:text-neon-lime transition-colors">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 px-6 border-t border-white/10">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-gray-500 text-sm">© 2024 Portfolio. All rights reserved.</p>
+            <p class="text-gray-500 text-sm">Designed with passion & creativity</p>
+        </div>
+    </footer>
+
+    <script>
+        // Custom Cursor
+        const cursor = document.getElementById('cursor');
+        const hoverTriggers = document.querySelectorAll('.hover-trigger');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX - 10 + 'px';
+            cursor.style.top = e.clientY - 10 + 'px';
+        });
+
+        hoverTriggers.forEach(trigger => {
+            trigger.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+            trigger.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+        });
+
+        // Mobile Menu Toggle
+        function toggleMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Scroll Reveal Animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el));
+
+        // Project Filtering
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const projectCards = document.querySelectorAll('.project-card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update active button
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const filter = btn.getAttribute('data-filter');
+
+                projectCards.forEach(card => {
+                    if (filter === 'all' || card.getAttribute('data-category') === filter) {
+                        card.style.display = 'block';
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                        }, 10);
+                    } else {
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(20px)';
+                        setTimeout(() => {
+                            card.style.display = 'none';
+                        }, 300);
+                    }
+                });
+            });
+        });
+
+        // Magnetic Button Effect
+        const magneticBtns = document.querySelectorAll('.magnetic-btn');
+
+        magneticBtns.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+
+                btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+            });
+
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0, 0)';
+            });
+        });
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Form Submission
+        function handleSubmit(e) {
+            e.preventDefault();
+            alert('Thank you for your message! I'll get back to you soon.');
+            e.target.reset();
+        }
+
+        // Parallax Effect for Blobs
+        document.addEventListener('mousemove', (e) => {
+            const blobs = document.querySelectorAll('.blob');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+
+            blobs.forEach((blob, index) => {
+                const speed = (index + 1) * 20;
+                blob.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+            });
+        });
+    </script>
+</body>
+</html>
